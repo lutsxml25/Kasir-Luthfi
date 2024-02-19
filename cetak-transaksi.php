@@ -1,44 +1,37 @@
-<?php
-include("header.php");
-?>
-      <body>
-        
-        <div class="p-4 col-20">
-          <div class="card mt-5">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aplikasi Kasir</title>
+  <link href="bootstrap-5.3.2-dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+        <div class="p-4 main-content">
+          
+          <div class="card col-6">
             <div class="card-body">
-            <table class="table table-bordered">
-		<thead>
-			<tr>
-				<th>No</th>
-				<th>Tanggal Transaksi</th>
-                <th>Nama Pemesan</th>
-				<th>Menu</th>	
-			</tr>
-		</thead>
-		<tbody>
+              <p style="text-align: center">Ayam Geprek MR. Bonn</p>
+            ============================
         <?php
             include("koneksi/koneksi.php");
 
-            $query = "SELECT PenjualanID, TanggalPenjualan FROM penjualan ORDER BY PenjualanID DESC LIMIT 1";
-            $result = mysqli_query($koneksi, $query);
-            
-            while ($row = mysqli_fetch_assoc($result)) {
-                echo "<tr>";
-                echo "<td>" . $row['PenjualanID'] . "</td>";
-                echo "<td>" . $row['TanggalPenjualan'] . "</td>";
-                ?>
-                <td>
-                  <?php
-                  $query1 = "SELECT NamaPelanggan FROM pelanggan WHERE PelangganID = '".$row['PenjualanID']."'";
-                  $result1 = mysqli_query($koneksi, $query1);
-                  
-                  while ($row1 = mysqli_fetch_assoc($result1)) {
-                    echo $row1['NamaPelanggan'];
-                  }
-                  ?>
-                </td>
-                <td>
-                    <table class="table table-bordered">
+            $sql = $koneksi->query("SELECT * FROM penjualan ORDER BY PenjualanID DESC LIMIT 1");
+            while ($data= $sql->fetch_assoc()) {
+        ?>
+               <p>ID Transaksi: <?php echo $data['PenjualanID']?></p>
+                <p>Tanggal Transaksi: <?php echo $data['TanggalPenjualan']?></p>
+                
+                <?php
+                    $sql2 = $koneksi->query("SELECT * FROM pelanggan WHERE PelangganID = '".$data['PenjualanID']."'");
+                    while ($data2= $sql2->fetch_assoc()) { ?>
+                      <p>Nama Pemesan: <?php echo $data2['NamaPelanggan'];?></p>
+                      <P>No Meja: <?php echo $data2['NoMeja'];?></p>
+                    <?php } ?>
+                    <tr>
+                      ============================
+                    <table class="table">
                         <thead>
                             <tr>
                                 <th>Nama Produk</th>
@@ -48,54 +41,52 @@ include("header.php");
                         </thead>
                         <tbody>
                         <?php
-                            // Fetch details for the current Penjualan
-                            $query2 = "SELECT ProdukID, PenjualanID, JumlahProduk, Subtotal FROM detailpenjualan WHERE DetailID = '" . $row['PenjualanID'] . "'";
-                            $result2 = mysqli_query($koneksi, $query2);
-
-                            // Inisialisasi total harga
-                            $totalHarga = 0;
-
-                            while ($detailrow = mysqli_fetch_assoc($result2)) {
-                                echo "<tr>";
-                                
-                                // Fetch NamaProduk
-                                $query3 = "SELECT NamaProduk FROM produk WHERE ProdukID = '" . $detailrow['ProdukID'] . "' ";
-                                $result3 = mysqli_query($koneksi, $query3);
-
-                                while ($row2 = mysqli_fetch_assoc($result3)) {
-                                    echo "<td>" . $row2['NamaProduk'] . "</td>";
-                                }
-
-                                echo "<td>" . $detailrow['JumlahProduk'] . " Pcs</td>";
-                                echo "<td>RP." . $detailrow['Subtotal'] . "</td>";
-                                echo "</tr>";
-
-                                // Tambahkan Subtotal ke total harga
-                                $totalHarga += $detailrow['Subtotal'];
-                            }
-
-                            // Menampilkan total harga di luar loop
-                            echo "<tr>";
-                            echo "<td colspan='2'><strong>Total Harga:</strong></td>";
-                            echo "<td colspan='2'><strong>RP." . $totalHarga . ",00</strong></td>";
-                            echo "</tr>";
-                        ?>
+                          // Fetch details for the current Penjualan
+                          $sql3 = $koneksi->query("SELECT * FROM detailpenjualan WHERE DetailID = '" . $data['PenjualanID'] . "'");
                             
+                          $totalharga = 0;
+
+                          while ($data3= $sql3->fetch_assoc()) {
+                        ?>
+                            <tr>
+                              <td>
+                              <?php
+                                $sql4 = $koneksi->query("SELECT * FROM produk WHERE ProdukID = '" . $data3['ProdukID'] . "' ");
+                                while ($data4= $sql4->fetch_assoc()) {
+                                    echo $data4['NamaProduk'];
+                                }
+                              ?>
+                              </td>
+                              <td><?php echo $data3['JumlahProduk']?> Pcs</td>
+                              <td>RP.<?php echo number_format($data3['Subtotal']) ?></td>
+                             
+                            </tr>
+
+                            <?php
+                              $totalproduk = $data3['JumlahProduk'] * $data3['Subtotal'];
+                              $totalharga += $totalproduk;
+                            }
+                            ?>
+
+                            <tr>
+                            <td colspan='2'><strong>Total Harga:</strong></td>
+                            <td colspan='2'><strong>RP.<?php echo number_format("$totalharga") ?></strong></td>
+                            </tr>
+                            
+
                         </tbody>
                     </table>
-                </td>
-                <?php
-                echo "</tr>";
-              }
-              
-        ?>
-		</tbody>
-	</table>
+                    <?php } ?>
+            ============================
+            <p style="text-align: center"><?php  echo date('d-m-Y H:i:s'); ?></p>
+            ============================
+            <p style="text-align: center">Kritik & Saran Whatsapp: 085693204615</p>
             </div>
           </div>
         </div>
-      </body>
-      
-      <script>
+        <script>
         window.print()
-    </script>
+      </script>
+        
+</body>
+</html>

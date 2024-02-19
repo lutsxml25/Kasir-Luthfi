@@ -80,7 +80,7 @@
             ============================
             <p style="text-align: center"><?php  echo date('d-m-Y H:i:s'); ?></p>
             ============================
-            <p style="text-align: center">Kritik & Saran Whatsapp: 085693204615</p>
+            <p style="text-align: center">Kritik & Saran Whatsapp: 081218273120</p>
             </div>
           </div>
         </div>
